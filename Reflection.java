@@ -18,7 +18,7 @@ public class Reflection {
 				+ c.getSimpleName());
 
 		if (c.getSuperclass() != null) {
-			output.append(" extends " + c.getSuperclass()); // unschoen...
+			output.append(" extends " + c.getSuperclass().getSimpleName());
 		}
 
 		// implemented interfaces
