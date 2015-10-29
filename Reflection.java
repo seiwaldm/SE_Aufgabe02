@@ -70,8 +70,8 @@ public class Reflection {
 		// methods
 		Method[] methods = c.getDeclaredMethods();
 		for (Method m : methods) {
-			output.append("\t" + Modifier.toString(c.getModifiers()) + " " + m.getReturnType() + " "
-					+ m.getName()); // TODO some return-types fuck around...
+			output.append("\t" + Modifier.toString(c.getModifiers()) + " " + m.getReturnType().getSimpleName() + " "
+					+ m.getName());
 			Class[] para = m.getParameterTypes();
 			printParameters(para);
 
