@@ -49,8 +49,8 @@ public class Reflection {
 		Field[] fields = c.getDeclaredFields();
 		if (fields != null) {
 			for (Field f : fields) {
-				// TODO schaut anders aus, als in der Vorlage... :(
-				output.append("\t" + Modifier.toString(f.getModifiers()) + " " + f.getType() + " "
+				// TODO schaut anders aus, als in der Vorlage... :( default-Werte fehlen!
+				output.append("\t" + Modifier.toString(f.getModifiers()) + " " + f.getType().getSimpleName() + " "
 						+ f.getName() + "\n");
 			}
 		}
@@ -74,7 +74,6 @@ public class Reflection {
 					+ m.getName());
 			Class[] para = m.getParameterTypes();
 			printParameters(para);
-
 		}
 
 		output.append("\n}");
