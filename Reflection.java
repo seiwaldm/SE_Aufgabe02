@@ -6,12 +6,29 @@ import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.Stack;
 
+/**
+ * PS Software Engineering WS2015 <br>
+ * <br>
+ * 
+ * This class provides methods to reconstruct the source skeleton of a Java applications .class-file using Java Reflection
+ * 
+ * @author Markus Seiwald, Kevin Schoergnhofer 
+ *
+ */
+ 
 public class Reflection {
 
 	StringBuilder output1 = new StringBuilder();
 	StringBuilder output2 = new StringBuilder();
 	Hashtable<String, String> usedPackages = new Hashtable<>();
 
+	/**
+	 * reconstructs the source skeleton of the given class
+	 * 
+	 * @param c the class which should get reconstructed
+	 * @param ps the printstream ... (TODO: fuer was braucht man den ps ueberhaupt?)
+	 *
+	 */
 	public void reconstruct(Class c, PrintStream ps) {
 
 		// package:
@@ -113,6 +130,14 @@ public class Reflection {
 		System.out.println(output);
 	}
 
+	/**
+	 * reconstructs the source skeleton of the given class
+	 * 
+	 * @param fullClassname the class name of the class which should get reconstructed
+	 * @param ps the printstream ... (TODO: fuer was braucht man den ps ueberhaupt?)
+	 * @throws ClassNotFoundException if the class corresponding to the given class name was not found
+	 *
+	 */
 	public void reconstruct(String fullClassname, PrintStream ps) throws ClassNotFoundException {
 
 	}
