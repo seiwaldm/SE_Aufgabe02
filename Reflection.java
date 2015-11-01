@@ -139,7 +139,8 @@ public class Reflection {
 	 *
 	 */
 	public void reconstruct(String fullClassname, PrintStream ps) throws ClassNotFoundException {
-
+		Class c = Class.forName(fullClassname);
+		reconstruct(c, ps);
 	}
 
 	// helper method to print parameters of constructors and methods:
