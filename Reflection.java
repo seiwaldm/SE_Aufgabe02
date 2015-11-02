@@ -10,12 +10,13 @@ import java.util.Stack;
  * PS Software Engineering WS2015 <br>
  * <br>
  * 
- * This class provides methods to reconstruct the source skeleton of a Java applications .class-file using Java Reflection
+ * This class provides methods to reconstruct the source skeleton of a Java
+ * applications .class-file using Java Reflection
  * 
- * @author Markus Seiwald, Kevin Schoergnhofer 
+ * @author Markus Seiwald, Kevin Schoergnhofer
  *
  */
- 
+
 public class Reflection {
 
 	StringBuilder output1 = new StringBuilder();
@@ -25,8 +26,11 @@ public class Reflection {
 	/**
 	 * reconstructs the source skeleton of the given class
 	 * 
-	 * @param c the class which should get reconstructed
-	 * @param ps the printstream ... (TODO: fuer was braucht man den ps ueberhaupt?)
+	 * @param c
+	 *            the class which should get reconstructed
+	 * @param ps
+	 *            the printstream ... (TODO: fuer was braucht man den ps
+	 *            ueberhaupt?)
 	 *
 	 */
 	public void reconstruct(Class c, PrintStream ps) {
@@ -41,7 +45,7 @@ public class Reflection {
 			output2.append("interface ");
 		else
 			output2.append("class ");
-		output2.append(c.getSimpleName() + " ");
+		output2.append(c.getSimpleName() + "Dummy ");
 
 		// extended abstract class
 		if (Modifier.isAbstract(c.getSuperclass().getModifiers())) {
@@ -78,7 +82,8 @@ public class Reflection {
 		// constructors
 		Constructor[] constructors = c.getConstructors();
 		for (Constructor con : constructors) {
-			output2.append("\t" + Modifier.toString(con.getModifiers()) + " " + c.getSimpleName());
+			output2.append("\t" + Modifier.toString(con.getModifiers()) + " " + c.getSimpleName()
+					+ "Dummy");
 			Class[] para = con.getParameterTypes();
 			printParameters(para);
 			output2.append("{\n\t\tSystem.out.println(\"constructor\");\n\t}\n\n");
@@ -116,11 +121,20 @@ public class Reflection {
 		// imports:
 		Stack<String> imported = new Stack<String>();
 		imported.addAll(usedPackages.values());
+
+		// a bit inconvenient to handle if no package is defined:
+		// TODO check solution extensively
 		while (!imported.isEmpty()) {
 			String usedPackage = imported.pop();
-			if (!usedPackage.contains(c.getPackage().getName()) && !usedPackage.contains("void")
-					&& !usedPackage.contains("java.lang"))
-				output1.append("import " + usedPackage + ";\n");
+			if (c.getPackage() != null) {
+				if (!usedPackage.contains(c.getPackage().getName()) && !usedPackage.contains("void")
+						&& !usedPackage.contains("java.lang"))
+					output1.append("import " + usedPackage + ";\n");
+			} else {
+				if (!usedPackage.contains("void") && !usedPackage.contains("java.lang")
+						&& usedPackage.contains("."))
+					output1.append("import " + usedPackage + ";\n");
+			}
 		}
 
 		output1.append("\n");
@@ -128,14 +142,20 @@ public class Reflection {
 		// merge outputs:
 		String output = output1.toString() + output2.toString();
 		System.out.println(output);
+		ps.print(output);
 	}
 
 	/**
 	 * reconstructs the source skeleton of the given class
 	 * 
-	 * @param fullClassname the class name of the class which should get reconstructed
-	 * @param ps the printstream ... (TODO: fuer was braucht man den ps ueberhaupt?)
-	 * @throws ClassNotFoundException if the class corresponding to the given class name was not found
+	 * @param fullClassname
+	 *            the class name of the class which should get reconstructed
+	 * @param ps
+	 *            the printstream ... (TODO: fuer was braucht man den ps
+	 *            ueberhaupt?)
+	 * @throws ClassNotFoundException
+	 *             if the class corresponding to the given class name was not
+	 *             found
 	 *
 	 */
 	public void reconstruct(String fullClassname, PrintStream ps) throws ClassNotFoundException {
