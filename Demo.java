@@ -1,9 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.AbstractCollection;
-import java.util.AbstractList;
-import java.util.ArrayList;
 
 /**
  * PS Software Engineering WS2015 <br>
@@ -12,7 +9,6 @@ import java.util.ArrayList;
  * This demo class tests and shows the functionality of the Reflection class
  * 
  * @author Markus Seiwald, Kevin Schoergnhofer
- *
  */
 
 public class Demo {
@@ -22,25 +18,23 @@ public class Demo {
 	 * 
 	 * @param args
 	 *            standard parameter
-	 *
 	 */
 	public static void main(String[] args) {
-		String className = "java.util.ArrayList";
+		String className = "RPN";
 		Class input;
 		FileOutputStream output;
 		PrintStream ps;
-		
+
 		try {
 			input = Class.forName(className);
 			output = new FileOutputStream(input.getSimpleName() + "Dummy.java");
 			ps = new PrintStream(output);
 			Reflection demo = new Reflection();
-			demo.reconstruct(input, ps);
+			demo.reconstruct(className, ps);
 			ps.close();
-		} catch (ClassNotFoundException e){
-			System.err.println("Couldn't find .class Input");
-		}
-			catch (FileNotFoundException e) {
+		} catch (ClassNotFoundException e) {
+			System.err.println("Couldn't find Class");
+		} catch (FileNotFoundException e) {
 			System.err.println("Error in writing to file");
 		}
 	}

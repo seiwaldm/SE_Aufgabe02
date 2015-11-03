@@ -4,24 +4,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Hashtable;
-import java.util.Stack;
 
 /**
  * PS Software Engineering WS2015 <br>
  * <br>
- * 
  * This class provides methods to reconstruct the source skeleton of a Java
- * applications .class-file using Java Reflection
+ * application's .class-file using Java Reflection
  * 
  * @author Markus Seiwald, Kevin Schoergnhofer
- *
  */
 
 public class Reflection {
 
-	StringBuilder output1 = new StringBuilder();
-	StringBuilder output2 = new StringBuilder();
-	Hashtable<String, String> usedPackages = new Hashtable<>();
+	private StringBuilder output1 = new StringBuilder();
+	private StringBuilder output2 = new StringBuilder();
+	private Hashtable<String, String> usedPackages = new Hashtable<>();
 
 	/**
 	 * reconstructs the source skeleton of the given class
@@ -29,9 +26,7 @@ public class Reflection {
 	 * @param c
 	 *            the class which should get reconstructed
 	 * @param ps
-	 *            the printstream ... (TODO: fuer was braucht man den ps
-	 *            ueberhaupt?)
-	 *
+	 *            printstream to write the data to
 	 */
 	public void reconstruct(Class c, PrintStream ps) {
 
@@ -41,16 +36,16 @@ public class Reflection {
 
 		// class modifiers & name
 		output2.append(Modifier.toString(c.getModifiers()) + " ");
-		if (c.isInterface())
-			output2.append("interface ");
-		else
+		if (!c.isInterface())
 			output2.append("class ");
 		output2.append(c.getSimpleName() + "Dummy ");
 
 		// extended abstract class
-		if (Modifier.isAbstract(c.getSuperclass().getModifiers())) {
-			output2.append("extends " + c.getSuperclass().getSimpleName() + " ");
-			usedPackages(c.getSuperclass());
+		if (!c.isInterface()) {
+			if (Modifier.isAbstract(c.getSuperclass().getModifiers())) {
+				output2.append("extends " + c.getSuperclass().getSimpleName() + " ");
+				usedPackages(c.getSuperclass());
+			}
 		}
 
 		// implemented interfaces
@@ -94,6 +89,8 @@ public class Reflection {
 		// methods
 		Method[] methods = c.getDeclaredMethods();
 		for (Method m : methods) {
+
+			// method head:
 			output2.append("\t" + Modifier.toString(m.getModifiers()) + " "
 					+ m.getReturnType().getSimpleName() + " " + m.getName());
 			usedPackages(m.getReturnType());
@@ -108,40 +105,45 @@ public class Reflection {
 				}
 				output2.deleteCharAt(output2.length() - 2);
 			}
-			output2.append("{\n\t\tSystem.out.println(\"" + m.getName() + "\");\n\t}\n\n");
-			if (m.getReturnType() != void.class) {
-				output2.delete(output2.length() - 5, output2.length() - 1);
-				output2.append(
-						"\t\treturn " + setValue(m.getReturnType().getSimpleName()) + ";\n\t}\n\n");
+			// skip method body if class is an interface or method is abstract:
+			if (!c.isInterface() && !Modifier.toString(m.getModifiers()).contains("abstract")) {
+				output2.append("{\n\t\tSystem.out.println(\"" + m.getName() + "\");\n\t}\n\n");
+				if (m.getReturnType() != void.class) {
+					output2.delete(output2.length() - 5, output2.length() - 1);
+					output2.append("\t\treturn " + setValue(m.getReturnType().getSimpleName())
+							+ ";\n\t}\n\n");
+				}
+			} else {
+				output2.deleteCharAt(output2.length() - 1);
+				output2.append(";\n\n");
 			}
 		}
 
 		output2.append("}");
 
-		// imports:
-		Stack<String> imported = new Stack<String>();
-		imported.addAll(usedPackages.values());
-
-		// a bit inconvenient to handle if no package is defined:
-		// TODO check solution extensively
-		while (!imported.isEmpty()) {
-			String usedPackage = imported.pop();
-			if (c.getPackage() != null) {
-				if (!usedPackage.contains(c.getPackage().getName()) && !usedPackage.contains("void")
-						&& !usedPackage.contains("java.lang"))
-					output1.append("import " + usedPackage + ";\n");
-			} else {
-				if (!usedPackage.contains("void") && !usedPackage.contains("java.lang")
-						&& usedPackage.contains("."))
-					output1.append("import " + usedPackage + ";\n");
+		// after scanning the class handle imports:
+		for (String s : usedPackages.values()) {
+			String usedPackage = s;
+			boolean javaLang = usedPackage.contains("java.lang")
+					&& Character.isUpperCase(usedPackage.charAt(10));
+			if (usedPackage.contains(".")) {
+				if (c.getPackage() != null) {
+					String packageName = c.getPackage().getName();
+					boolean ownPackage = usedPackage.contains(packageName)
+							&& Character.isUpperCase(usedPackage.charAt(packageName.length() + 1));
+					if (!ownPackage && !javaLang)
+						output1.append("import " + usedPackage + ";\n");
+				} else {
+					if (!javaLang)
+						output1.append("import " + usedPackage + ";\n");
+				}
 			}
 		}
 
 		output1.append("\n");
 
-		// merge outputs:
+		// merge outputs and send to printstream:
 		String output = output1.toString() + output2.toString();
-		System.out.println(output);
 		ps.print(output);
 	}
 
@@ -149,10 +151,10 @@ public class Reflection {
 	 * reconstructs the source skeleton of the given class
 	 * 
 	 * @param fullClassname
-	 *            the class name of the class which should get reconstructed
+	 *            the canonical name of the class as defined in the java
+	 *            language specification
 	 * @param ps
-	 *            the printstream ... (TODO: fuer was braucht man den ps
-	 *            ueberhaupt?)
+	 *            printstream to write the data to
 	 * @throws ClassNotFoundException
 	 *             if the class corresponding to the given class name was not
 	 *             found
@@ -183,11 +185,11 @@ public class Reflection {
 		case "boolean":
 			return "false";
 		case "char":
-			return "'u0000'";
+			return "'c'";
 		case "double":
 			return "0.0";
 		case "float":
-			return "0.0";
+			return "0";
 		case "int":
 			return "0";
 		case "long":
@@ -206,8 +208,6 @@ public class Reflection {
 		String name = c.getSimpleName();
 		if (name.charAt(name.length() - 1) == ']')
 			name = name.substring(0, name.length() - 2);
-		if (name != "boolean" && name != "char" && name != "double" && name != "float"
-				&& name != "long" && name != "short" && name != "byte" && name != "int")
-			usedPackages.put(name, c.getCanonicalName());
+		usedPackages.put(name, c.getCanonicalName());
 	}
 }
