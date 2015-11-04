@@ -33,9 +33,9 @@ public class Demo {
 			demo.reconstruct(className, ps);
 			ps.close();
 		} catch (ClassNotFoundException e) {
-			System.err.println("Couldn't find Class");
+			throw new RuntimeException(e);
 		} catch (FileNotFoundException e) {
-			System.err.println("Error in writing to file");
+			throw new RuntimeException(e);
 		}
 	}
 
