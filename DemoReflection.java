@@ -20,17 +20,16 @@ public class DemoReflection {
 	 *            standard parameter
 	 */
 	public static void main(String[] args) {
-		String className = "RPN";
 		Class input;
 		FileOutputStream output;
 		PrintStream ps;
 
 		try {
-			input = Class.forName(className);
+			input = ArrayList.class;
 			output = new FileOutputStream(input.getSimpleName() + "Dummy.java");
 			ps = new PrintStream(output);
 			Reflection demo = new Reflection();
-			demo.reconstruct(className, ps);
+			demo.reconstruct(input, ps);
 			ps.close();
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
