@@ -1,7 +1,6 @@
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 
 /**
  * PS Software Engineering WS2015 <br>
@@ -21,12 +20,13 @@ public class DemoReflection {
 	 *            standard parameter
 	 */
 	public static void main(String[] args) {
+		String className = "java.util.ArrayList";
 		Class input;
 		FileOutputStream output;
 		PrintStream ps;
 
 		try {
-			input = ArrayList.class;
+			input = Class.forName(className);
 			output = new FileOutputStream(input.getSimpleName() + "Dummy.java");
 			ps = new PrintStream(output);
 			Reflection demo = new Reflection();
