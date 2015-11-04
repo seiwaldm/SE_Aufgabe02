@@ -56,6 +56,12 @@ public class Reflection {
 				output2.append(i.getSimpleName() + ", ");
 				usedPackages(i);
 			}
+			
+			/*
+			* deletes the last delimiter added to the output in the previous step, 
+			* because every interface-name gets appended to the output together with a delimiter for the following interface-name.
+			* So in the end you have to delete the last delimiter.
+			*/
 			output2.deleteCharAt(output2.length() - 2);
 		}
 
@@ -103,6 +109,12 @@ public class Reflection {
 					output2.append(e.getSimpleName() + ", ");
 					usedPackages(e);
 				}
+				
+				/*
+				* deletes the last delimiter added to the output in the previous step, 
+				* because every exception-name gets appended to the output together with a delimiter for the following exception-name.
+				* So in the end you have to delete the last delimiter.
+				*/
 				output2.deleteCharAt(output2.length() - 2);
 			}
 			// skip method body if class is an interface or method is abstract:
