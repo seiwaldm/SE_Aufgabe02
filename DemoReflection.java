@@ -11,7 +11,7 @@ import java.io.PrintStream;
  * @author Markus Seiwald, Kevin Schoergnhofer
  */
 
-public class Demo {
+public class DemoReflection {
 
 	/**
 	 * tests and shows the functionality of the Reflection class
